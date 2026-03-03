@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Product Design 101</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0c0c14;
+    --surface: #14141f;
+    --card: #1a1a2e;
+    --accent: #ff6b35;
+    --text: #f0eff5;
+    --muted: #8b8a9b;
+    --border: rgba(255,255,255,0.07);
+  }
+
+  body {
+    background: var(--bg);
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text);
+    min-height: 100dvh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .app {
+    width: 100%;
+    max-width: 420px;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 108px 24px 32px;
+    position: relative;
+  }
+
+  .header {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    padding: 28px 24px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1px;
+  }
+
+  .header-eyebrow {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .header-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--text);
+    line-height: 1.1;
+  }
+
+  .header-title em { font-style: normal; color: var(--accent); }
+
+  .header-sub {
+    font-size: 11.5px;
+    color: var(--muted);
+    font-weight: 300;
+    line-height: 1.5;
+    margin-top: 4px;
+    max-width: 280px;
+  }
+
+  /* Progress */
+  .progress-wrap { width: 100%; margin-bottom: 22px; }
+
+  .progress-meta {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 7px;
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .progress-meta strong {
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--muted);
+  }
+
+  .bar-track {
+    width: 100%;
+    height: 3px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+
+  .bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), #a855f7);
+    border-radius: 99px;
+    transition: width 0.4s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  /* Card — fixed height */
+  .card-wrapper { width: 100%; }
+
+  .card {
+    width: 100%;
+    height: 380px; /* fixed — sized to tallest content */
+    background: var(--card);
+    border-radius: 24px;
+    border: 1px solid var(--border);
+    padding: 32px 28px 28px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: -80px; right: -80px;
+    width: 220px; height: 220px;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--glow, rgba(255,107,53,0.1)) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .card.exit-left  { animation: exitL  .26s ease forwards; }
+  .card.exit-right { animation: exitR  .26s ease forwards; }
+  .card.enter-right { animation: enterR .32s cubic-bezier(.34,1.56,.64,1) forwards; }
+  .card.enter-left  { animation: enterL .32s cubic-bezier(.34,1.56,.64,1) forwards; }
+
+  @keyframes exitL  { to { transform: translateX(-70px) scale(.92); opacity: 0; } }
+  @keyframes exitR  { to { transform: translateX( 70px) scale(.92); opacity: 0; } }
+  @keyframes enterR { from { transform: translateX( 70px) scale(.92); opacity: 0; } to { transform: none; opacity: 1; } }
+  @keyframes enterL { from { transform: translateX(-70px) scale(.92); opacity: 0; } to { transform: none; opacity: 1; } }
+
+  /* Card inner layout */
+  .card-body {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  .icon-ring {
+    width: 68px;
+    height: 68px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    flex-shrink: 0;
+    margin-bottom: 18px;
+  }
+
+  .concept-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    line-height: 1.15;
+    margin-bottom: 10px;
+    letter-spacing: -0.02em;
+    flex-shrink: 0;
+  }
+
+  .concept-desc {
+    font-size: 13.5px;
+    line-height: 1.72;
+    color: var(--muted);
+    font-weight: 300;
+    flex: 1;
+  }
+
+  .concept-desc strong {
+    color: rgba(240,239,245,0.82);
+    font-weight: 500;
+  }
+
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 16px;
+    padding: 4px 11px;
+    border-radius: 99px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    flex-shrink: 0;
+    align-self: flex-start;
+  }
+
+  .tag-dot {
+    width: 4px; height: 4px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* Follow card */
+  .follow-body {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 0;
+  }
+
+  .follow-body .icon-ring { margin: 0 auto 16px; }
+  .follow-body .concept-name { margin-bottom: 8px; }
+  .follow-body .concept-desc { flex: none; }
+
+  .social-links {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 18px;
+    width: 100%;
+  }
+
+  .social-btn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 13px 14px;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    background: rgba(255,255,255,0.04);
+    color: var(--text);
+    text-decoration: none;
+    transition: background 0.18s;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .social-btn:active { background: rgba(255,255,255,0.08); }
+
+  .social-ico {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .social-info { display: flex; flex-direction: column; gap: 1px; flex: 1; text-align: left; }
+  .social-info strong { font-size: 13px; font-weight: 600; }
+  .social-info span { font-size: 11px; color: var(--muted); }
+  .social-arrow { color: var(--muted); font-size: 13px; }
+
+  /* Nav */
+  .nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    margin-top: 18px;
+  }
+
+  .nav-btn {
+    width: 52px; height: 52px;
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    font-size: 20px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: transform .15s, background .15s;
+    flex-shrink: 0;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .nav-btn:active { transform: scale(.9); }
+  .nav-btn:disabled { opacity: .22; pointer-events: none; }
+
+  .nav-btn.fwd {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+    box-shadow: 0 6px 20px rgba(255,107,53,.28);
+  }
+
+  .nav-btn.fwd:active { background: #d95c28; }
+
+  .nav-label {
+    flex: 1;
+    text-align: center;
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--muted);
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="header">
+    <div class="header-eyebrow">Beginner's Guide</div>
+    <div class="header-title">Product<br>Design <em>101</em></div>
+    <div class="header-sub">12 concepts every designer should know — from fundamentals to the AI era.</div>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-meta">
+      <span id="remainLabel"></span>
+      <strong id="fracLabel"></strong>
+    </div>
+    <div class="bar-track"><div class="bar-fill" id="barFill"></div></div>
+  </div>
+
+  <div class="card-wrapper">
+    <div class="card" id="card">
+      <div id="cardInner"></div>
+    </div>
+  </div>
+
+  <nav class="nav">
+    <button class="nav-btn" id="prevBtn" onclick="go(-1)">&#8592;</button>
+    <button class="nav-btn fwd" id="nextBtn" onclick="go(1)">&#8594;</button>
+  </nav>
+
+</div>
+<script>
+const cards = [
+  {
+    name: "Outcome-First Thinking",
+    desc: "Features ship. Outcomes stick. Before you touch Figma, ask: <strong>what should change in how someone lives or works?</strong> The best designers in tech frame every project around a human outcome first — and treat the interface as just the delivery mechanism.",
+    tag: "Strategy",
+    icon: "🎯",
+    color: "#ff6b35",
+    glow: "rgba(255,107,53,.13)"
+  },
+  {
+    name: "Systems Over Screens",
+    desc: "Modern product design isn't about crafting perfect individual screens — it's about building <strong>coherent systems</strong>. Every component, pattern, and interaction should feel like it belongs to the same organism. Think in tokens, not one-offs.",
+    tag: "Design Systems",
+    icon: "🧩",
+    color: "#a855f7",
+    glow: "rgba(168,85,247,.13)"
+  },
+  {
+    name: "Progressive Disclosure",
+    desc: "Show people what they need, when they need it. <strong>Complexity shouldn't disappear — it should be earned.</strong> AI products especially fail here: dumping every capability upfront is how you get a product that feels overwhelming before it feels useful.",
+    tag: "Interaction",
+    icon: "🪄",
+    color: "#06b6d4",
+    glow: "rgba(6,182,212,.13)"
+  },
+  {
+    name: "Mental Models",
+    desc: "Users don't come to your product blank — they bring <strong>preloaded expectations</strong> from every app they've ever used. Your job is to meet those models or deliberately break them with something better. Fighting them silently is how you create confusion.",
+    tag: "Cognition",
+    icon: "🧠",
+    color: "#f59e0b",
+    glow: "rgba(245,158,11,.13)"
+  },
+  {
+    name: "Hierarchy is Prioritization",
+    desc: "Visual hierarchy isn't a design skill — it's a <strong>product decision made visible</strong>. What's biggest, boldest, and first on screen reflects what your team believes matters most. If everything is emphasized, nothing is. Own the tradeoffs.",
+    tag: "Visual Design",
+    icon: "📐",
+    color: "#ec4899",
+    glow: "rgba(236,72,153,.13)"
+  },
+  {
+    name: "Affordances in the AI Era",
+    desc: "When interfaces become conversational, the old affordance playbook breaks down. <strong>How do you signal capability to a blank input?</strong> The best AI products use examples, scaffolding, and progressive prompting — not just a cursor and a placeholder.",
+    tag: "AI & Interaction",
+    icon: "🤖",
+    color: "#10b981",
+    glow: "rgba(16,185,129,.13)"
+  },
+  {
+    name: "Error States are UX",
+    desc: "Empty states, error messages, and loading screens are <strong>not edge cases — they're the product</strong>. For many users, a broken flow is their first impression. Treat every failure state with the same design rigor as your core happy path.",
+    tag: "Craft",
+    icon: "⚠️",
+    color: "#f97316",
+    glow: "rgba(249,115,22,.13)"
+  },
+  {
+    name: "Accessibility = Better Design",
+    desc: "Color contrast, touch targets, readable type, and keyboard nav don't just serve disabled users — they make <strong>every experience sharper</strong>. A11y constraints force clarity. Treat WCAG as a quality bar, not a compliance checklist.",
+    tag: "Inclusion",
+    icon: "♿",
+    color: "#22c55e",
+    glow: "rgba(34,197,94,.13)"
+  },
+  {
+    name: "Friction Isn't Always Bad",
+    desc: "The reflex to 'reduce friction' is overused. Some friction builds <strong>trust, comprehension, and commitment</strong>. Deleting a workspace, publishing to production, or making a purchase — a well-placed pause prevents regret. Intentional friction is a feature.",
+    tag: "Psychology",
+    icon: "⚡",
+    color: "#f43f5e",
+    glow: "rgba(244,63,94,.13)"
+  },
+  {
+    name: "Design Debt is Real Debt",
+    desc: "Inconsistent components, one-off patterns, and 'we'll fix it later' UX decisions compound — fast. <strong>Design debt slows engineering, confuses users, and fractures brand trust.</strong> The best designers advocate for cleanup work the way engineers advocate for refactors.",
+    tag: "Systems",
+    icon: "💳",
+    color: "#8b5cf6",
+    glow: "rgba(139,92,246,.13)"
+  },
+  {
+    name: "Prototype to Think",
+    desc: "Prototypes aren't for stakeholder presentations — they're for <strong>resolving ambiguity in your own head</strong>. The act of building a flow, even roughly, surfaces decisions that no amount of meeting discussion will. Make something interactive before you make it perfect.",
+    tag: "Process",
+    icon: "✏️",
+    color: "#14b8a6",
+    glow: "rgba(20,184,166,.13)"
+  },
+  {
+    name: "Typography is Voice",
+    desc: "Type is the first thing that tells a user what kind of product they're in. <strong>Size, weight, spacing, and typescale</strong> set tone before a single word is read. In a world where AI-generated interfaces are proliferating, sharp typography is one of the last differentiators of craft.",
+    tag: "Visual Design",
+    icon: "🔤",
+    color: "#6366f1",
+    glow: "rgba(99,102,241,.13)"
+  },
+  { isFollow: true }
+];
+
+const N = cards.length;
+let cur = 0, busy = false;
+
+function buildNormal(c) {
+  return `<div class="card-body">
+    <div class="icon-ring" style="background:${c.glow};box-shadow:0 0 0 1px ${c.color}33">${c.icon}</div>
+    <div class="concept-name">${c.name}</div>
+    <div class="concept-desc">${c.desc}</div>
+    <div class="tag"><div class="tag-dot" style="background:${c.color}"></div>${c.tag}</div>
+  </div>`;
+}
+
+function buildFollow() {
+  return `<div class="follow-body">
+    <img src="data:image/jpeg;base64,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" alt="Jeffrey Lewis" style="width:68px;height:68px;border-radius:50%;object-fit:cover;object-position:center top;border:2px solid rgba(255,107,53,.4);margin-bottom:16px;flex-shrink:0;" />
+    <div class="concept-name">That's a Wrap!</div>
+    <div class="concept-desc">Enjoyed this? Follow along for more product thinking, design systems, and UX in the AI era.</div>
+    <div class="social-links">
+      <a class="social-btn" href="https://www.threads.com/@jeffreylewis_design" target="_blank" rel="noopener">
+        <div class="social-ico" style="background:rgba(255,255,255,0.07)">
+          <svg width="17" height="17" viewBox="0 0 192 192" fill="none"><path d="M141.537 88.988a66.667 66.667 0 0 0-2.518-1.143c-1.482-27.307-16.403-42.94-41.457-43.1h-.34c-14.986 0-27.449 6.396-35.12 18.036l13.779 9.452c5.73-8.695 14.724-10.548 21.348-10.548h.229c8.249.053 14.474 2.452 18.503 7.129 2.932 3.405 4.893 8.111 5.864 14.05-7.314-1.243-15.224-1.626-23.68-1.14-23.82 1.371-39.134 15.264-38.105 34.568.522 9.792 5.4 18.216 13.735 23.719 7.047 4.652 16.124 6.927 25.557 6.412 12.458-.683 22.231-5.436 29.049-14.127 5.178-6.6 8.453-15.153 9.879-25.982 5.922 3.577 10.302 8.297 12.657 14.025 3.92 9.609 4.149 25.42-8.093 37.663-10.685 10.685-23.526 15.307-42.974 15.44-21.555-.147-37.846-7.08-48.434-20.6C33.319 134.333 28 118.049 28 96c0-22.049 5.319-38.333 15.822-48.4C54.41 36.08 70.701 29.147 92.256 29c21.72.147 38.234 7.12 49.088 20.718 5.31 6.589 9.305 14.889 11.887 24.612l16.137-4.304c-3.123-11.423-8.148-21.448-14.979-29.823C139.526 23.668 118.957 13.159 92.34 13H91.98C65.404 13.159 45.036 23.628 31.808 41.207 20.06 56.982 14 78.045 14 96c0 17.956 6.06 39.018 17.808 54.793 13.228 17.58 33.596 28.048 60.172 28.207h.36c24.092-.147 41.033-6.518 54.955-20.44 18.17-18.169 17.592-40.924 11.617-54.9-4.281-10.499-12.476-18.985-17.375-14.672z" fill="#f0eff5"/></svg>
+        </div>
+        <div class="social-info"><strong>Threads</strong><span>@jeffreylewis_design</span></div>
+        <span class="social-arrow">↗</span>
+      </a>
+      <a class="social-btn" href="https://www.linkedin.com/in/lwsjff" target="_blank" rel="noopener">
+        <div class="social-ico" style="background:rgba(10,102,194,0.18)">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="#4d9de0"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+        </div>
+        <div class="social-info"><strong>LinkedIn</strong><span>Jeffrey Lewis</span></div>
+        <span class="social-arrow">↗</span>
+      </a>
+    </div>
+  </div>`;
+}
+
+function render() {
+  const c = cards[cur];
+  const card = document.getElementById('card');
+
+  if (c.isFollow) {
+    card.style.setProperty('--glow','rgba(255,107,53,.1)');
+    document.getElementById('cardInner').innerHTML = buildFollow();
+  } else {
+    card.style.setProperty('--glow', c.glow);
+    document.getElementById('cardInner').innerHTML = buildNormal(c);
+  }
+
+  const pct = ((cur + 1) / N) * 100;
+  document.getElementById('barFill').style.width = pct + '%';
+  document.getElementById('fracLabel').textContent = `${cur + 1} / ${N}`;
+  const rem = N - cur - 1;
+  document.getElementById('remainLabel').textContent = rem === 0 ? '🎉 Done!' : `${rem} card${rem !== 1 ? 's' : ''} left`;
+
+  document.getElementById('prevBtn').disabled = cur === 0;
+  const nb = document.getElementById('nextBtn');
+  if (cur === N - 1) { nb.textContent = '✓'; nb.disabled = true; }
+  else { nb.innerHTML = '&#8594;'; nb.disabled = false; }
+}
+
+function go(dir) {
+  if (busy) return;
+  const nxt = cur + dir;
+  if (nxt < 0 || nxt >= N) return;
+  busy = true;
+  const card = document.getElementById('card');
+  card.classList.add(dir > 0 ? 'exit-left' : 'exit-right');
+  setTimeout(() => {
+    card.classList.remove('exit-left','exit-right');
+    cur = nxt; render();
+    card.classList.add(dir > 0 ? 'enter-right' : 'enter-left');
+    setTimeout(() => { card.classList.remove('enter-right','enter-left'); busy = false; }, 350);
+  }, 240);
+}
+
+let tx = 0;
+document.addEventListener('touchstart', e => { tx = e.touches[0].clientX; }, { passive: true });
+document.addEventListener('touchend', e => {
+  const dx = e.changedTouches[0].clientX - tx;
+  if (Math.abs(dx) > 50) go(dx < 0 ? 1 : -1);
+}, { passive: true });
+
+render();
+</script>
+</body>
+</html>
