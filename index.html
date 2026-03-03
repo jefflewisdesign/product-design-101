@@ -307,6 +307,30 @@
     font-weight: 700;
     color: var(--muted);
   }
+
+  .footer-tag {
+    width: 100%;
+    text-align: center;
+    margin-top: 16px;
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 300;
+    letter-spacing: 0.01em;
+  }
+
+  .footer-tag a {
+    color: var(--text);
+    text-decoration: none;
+    font-weight: 500;
+    border-bottom: 1px solid rgba(240,239,245,0.2);
+    padding-bottom: 1px;
+    transition: border-color 0.2s;
+  }
+
+  .footer-tag a:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
 </style>
 </head>
 <body>
@@ -336,6 +360,10 @@
     <button class="nav-btn" id="prevBtn" onclick="go(-1)">&#8592;</button>
     <button class="nav-btn fwd" id="nextBtn" onclick="go(1)">&#8594;</button>
   </nav>
+
+  <div class="footer-tag">
+    Vibed by <a href="https://jefflewis.design" target="_blank" rel="noopener">Jeffrey Lewis</a>, Product Designer
+  </div>
 
 </div>
 <script>
